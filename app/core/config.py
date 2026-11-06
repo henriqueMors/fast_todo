@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=PASTA_PROJETO / ".env", case_sensitive=True)
 
     API_V1_STR: str = "/api/v1"
-    PROJECT_NAME: str = "TODOFast"
+    PROJECT_NAME: str = "FastToDo"
 
     ##JWT Login
     JWT_SECRET_KEY: str
