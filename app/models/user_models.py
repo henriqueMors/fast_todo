@@ -23,4 +23,8 @@ class User(Base):
         return f"<User {self.email}>"
 
     def __str__(self) -> str:
-        return self.email
+        return self.email]
+
+    @classmethod
+    def by_email(cls, session, email: str) -> "User":
+        return session.query(cls).filter(cls.email == email).first()
