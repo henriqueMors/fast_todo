@@ -26,3 +26,7 @@ class UserService:
         if not verify_password(password, usuario.hash_password):
             return None
         return usuario
+
+    @staticmethod
+    def get_user_by_id(session: Session, user_id) -> Optional[User]:
+        return session.get(User, user_id)
