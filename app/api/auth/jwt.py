@@ -26,4 +26,5 @@ def login(data: OAuth2PasswordRequestForm = Depends(),
         return {
         "access_token": create_access_token(usuario.user_id),
         "refresh_token": create_refresh_token(usuario.user_id),
+        "token_type": "bearer",
     }
