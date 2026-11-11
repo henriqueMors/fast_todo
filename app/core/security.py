@@ -31,3 +31,13 @@ def create_access_token(subject: Any, expires_delta: Optional[timedelta] = None)
 
     info_jwt = {"exp": expira_em, "sub": str(subject)}
     return jwt.encode(info_jwt, settings.JWT_SECRET_KEY, algorithm=settings.ALGORITHM)
+
+def create_refresh_token(subject: Any, expires_delta: Optional[timedelta] = None) -> str:
+    """Cria o token de renovação, que serve para pedir um access token novo."""
+    if expires_delta is not None:
+        expira_em = datetime.now(timezone.utc) + expires_delta
+    else:
+        expira_em = datetime.now(timezone.utc) + timedelta(minutes=settings.REFRESH_TOKEN_EXPIRE_MINUTES)
+
+    info_jwt = {"exp": expira_em, "sub": str(subject)}
+    return jwt.encode(info_jwt, settings.JWT_REFRESH_SECRET_KEY, algorithm=settings.ALGORITHM)

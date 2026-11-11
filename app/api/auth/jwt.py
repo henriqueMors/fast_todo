@@ -1,5 +1,5 @@
 from typing import Any
-
+from core.security import create_access_token, create_refresh_token
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
@@ -23,4 +23,7 @@ def login(data: OAuth2PasswordRequestForm = Depends(),
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="E-mail ou senha incorretos",
         )
-    return {"mensagem": f"Login OK: {usuario.email}"}   # provisório: aqui entram os tokens
+        return {
+        "access_token": create_access_token(usuario.user_id),
+        "refresh_token": create_refresh_token(usuario.user_id),
+    }
