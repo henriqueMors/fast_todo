@@ -1,4 +1,5 @@
 import uuid
+from sqlalchemy.orm import relationship
 from datetime import datetime, timezone
 
 from sqlalchemy import Boolean, Column, DateTime, String, Uuid
@@ -7,6 +8,7 @@ from core.database import Base
 
 
 class User(Base):
+    todos = relationship("Todo", back_populates="owner", cascade="all, delete-orphan")
     __tablename__ = "users"
 
     user_id = Column(Uuid, primary_key=True, default=uuid.uuid4)          # UUID gerado sozinho
