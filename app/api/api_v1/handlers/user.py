@@ -12,7 +12,7 @@ from models.user_models import User
 user_router = APIRouter()
 
 
-@user_router.post("/adiciona", summary="Adiciona usuário",
+@user_router.post("/adiciona", summary="Adicionar usuário",
                   response_model=UserOut, status_code=status.HTTP_201_CREATED)
 def adiciona_usuario(data: UserAuth, session: Session = Depends(get_session)):
     try:
