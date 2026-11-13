@@ -1,28 +1,48 @@
-from typing import List
+from typing import List, Optional
 from uuid import UUID
-from fastapi import APIRouter, HTTPException, Depends, status
+
 from sqlalchemy.orm import Session
 
-from api.dependencies.user_deps import get_current_user
-from core.database import get_session
+from models.todo_models import Todo
 from models.user_models import User
-from schemas.todo_schema import TodoCreate, TodoDetail
-from services.todo_service import TodoService
-
-todo_router = APIRouter()
+from schemas.todo_schema import TodoCreate, TodoUpdate
 
 
-@todo_router.get('/{todo_id}', summary='Detalhe de Nota por Id', response_model=TodoDetail)
-def detail(todo_id: UUID, current_user: User = Depends(get_current_user),
-           session: Session = Depends(get_session)):
-    todo = TodoService.detail(session, current_user, todo_id)
-    if not todo:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Nota não encontrada")
-    return todo
+class TodoService:
+    @staticmethod
+    def list_todos(session: Session, user: User) -> List[Todo]:
+        return session.query(Todo).filter(Todo.owner_id == user.user_id).all()
 
+    @staticmethod
+    def create_todo(session: Session, user: User, data: TodoCreate) -> Todo:
+        todo = Todo(**data.model_dump(), owner_id=user.user_id)
+        session.add(todo)
+        session.commit()
+        session.refresh(todo)
+        return todo
 
-@todo_router.post('/create', summary="Adicionando Nota", response_model=TodoDetail,
-                  status_code=status.HTTP_201_CREATED)
-def create_todo(data: TodoCreate, current_user: User = Depends(get_current_user),
-                session: Session = Depends(get_session)):
-    return TodoService.create_todo(session, current_user, data)
+    @staticmethod
+    def detail(session: Session, user: User, todo_id: UUID) -> Optional[Todo]:
+        return (session.query(Todo)
+                .filter(Todo.todo_id == todo_id, Todo.owner_id == user.user_id)
+                .first())
+
+    @staticmethod
+    def update_todo(session: Session, user: User, todo_id: UUID, data: TodoUpdate) -> Optional[Todo]:
+        todo = TodoService.detail(session, user, todo_id)
+        if not todo:
+            return None
+        for campo, valor in data.model_dump(exclude_unset=True).items():
+            setattr(todo, campo, valor)
+        session.commit()
+        session.refresh(todo)
+        return todo
+
+    @staticmethod
+    def delete_todo(session: Session, user: User, todo_id: UUID) -> bool:
+        todo = TodoService.detail(session, user, todo_id)
+        if not todo:
+            return False
+        session.delete(todo)
+        session.commit()
+        return True

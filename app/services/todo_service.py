@@ -1,10 +1,11 @@
 from typing import List, Optional
 from uuid import UUID
+
 from sqlalchemy.orm import Session
 
 from models.todo_models import Todo
 from models.user_models import User
-from schemas.todo_schema import TodoCreate
+from schemas.todo_schema import TodoCreate, TodoUpdate
 
 
 class TodoService:
@@ -19,7 +20,7 @@ class TodoService:
         session.commit()
         session.refresh(todo)
         return todo
-    
+
     @staticmethod
     def detail(session: Session, user: User, todo_id: UUID) -> Optional[Todo]:
         return (session.query(Todo)
