@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from sqlalchemy.orm import Session
 
@@ -19,3 +19,9 @@ class TodoService:
         session.commit()
         session.refresh(todo)
         return todo
+    
+    @staticmethod
+    def detail(session: Session, user: User, todo_id: UUID) -> Optional[Todo]:
+        return (session.query(Todo)
+                .filter(Todo.todo_id == todo_id, Todo.owner_id == user.user_id)
+                .first())
