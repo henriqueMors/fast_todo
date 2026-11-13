@@ -1,6 +1,6 @@
 from typing import List
-
-from fastapi import APIRouter, Depends, status
+from uuid import UUID
+from fastapi import APIRouter, HTTPException, Depends, status
 from sqlalchemy.orm import Session
 
 from api.dependencies.user_deps import get_current_user
@@ -12,10 +12,13 @@ from services.todo_service import TodoService
 todo_router = APIRouter()
 
 
-@todo_router.get('/', summary="Listar Todas as Notas", response_model=List[TodoDetail])
-def listar(current_user: User = Depends(get_current_user),
+@todo_router.get('/{todo_id}', summary='Detalhe de Nota por Id', response_model=TodoDetail)
+def detail(todo_id: UUID, current_user: User = Depends(get_current_user),
            session: Session = Depends(get_session)):
-    return TodoService.list_todos(session, current_user)
+    todo = TodoService.detail(session, current_user, todo_id)
+    if not todo:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Nota não encontrada")
+    return todo
 
 
 @todo_router.post('/create', summary="Adicionando Nota", response_model=TodoDetail,
