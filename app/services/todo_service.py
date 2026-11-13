@@ -36,3 +36,12 @@ class TodoService:
         session.commit()
         session.refresh(todo)
         return todo
+
+    @staticmethod
+    def delete_todo(session: Session, user: User, todo_id: UUID) -> bool:
+        todo = TodoService.detail(session, user, todo_id)
+        if not todo:
+            return False
+        session.delete(todo)
+        session.commit()
+        return True
