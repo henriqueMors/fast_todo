@@ -1,0 +1,21 @@
+from typing import List
+
+from sqlalchemy.orm import Session
+
+from models.todo_models import Todo
+from models.user_models import User
+from schemas.todo_schema import TodoCreate
+
+
+class TodoService:
+    @staticmethod
+    def list_todos(session: Session, user: User) -> List[Todo]:
+        return session.query(Todo).filter(Todo.owner_id == user.user_id).all()
+
+    @staticmethod
+    def create_todo(session: Session, user: User, data: TodoCreate) -> Todo:
+        todo = Todo(**data.model_dump(), owner_id=user.user_id)
+        session.add(todo)
+        session.commit()
+        session.refresh(todo)
+        return todo
