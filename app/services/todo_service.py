@@ -25,3 +25,14 @@ class TodoService:
         return (session.query(Todo)
                 .filter(Todo.todo_id == todo_id, Todo.owner_id == user.user_id)
                 .first())
+
+    @staticmethod
+    def update_todo(session: Session, user: User, todo_id: UUID, data: TodoUpdate) -> Optional[Todo]:
+        todo = TodoService.detail(session, user, todo_id)
+        if not todo:
+            return None
+        for campo, valor in data.model_dump(exclude_unset=True).items():
+            setattr(todo, campo, valor)
+        session.commit()
+        session.refresh(todo)
+        return todo
