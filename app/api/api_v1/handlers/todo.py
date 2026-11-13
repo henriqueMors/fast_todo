@@ -15,7 +15,7 @@ todo_router = APIRouter()
 NAO_ENCONTRADA = HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Nota não encontrada")
 
 
-@todo_router.get('/', summary="Lista Todas as Notas", response_model=List[TodoDetail])
+@todo_router.get('/', summary="Listar Todas as Notas", response_model=List[TodoDetail])
 def listar(current_user: User = Depends(get_current_user),
            session: Session = Depends(get_session)):
     return TodoService.list_todos(session, current_user)
@@ -37,7 +37,7 @@ def detail(todo_id: UUID, current_user: User = Depends(get_current_user),
     return todo
 
 
-@todo_router.put('/{todo_id}', summary='Atualiza Nota', response_model=TodoDetail)
+@todo_router.put('/{todo_id}', summary='Atualizar Nota', response_model=TodoDetail)
 def update(todo_id: UUID, data: TodoUpdate, current_user: User = Depends(get_current_user),
            session: Session = Depends(get_session)):
     todo = TodoService.update_todo(session, current_user, todo_id, data)
@@ -46,7 +46,7 @@ def update(todo_id: UUID, data: TodoUpdate, current_user: User = Depends(get_cur
     return todo
 
 
-@todo_router.delete('/{todo_id}', summary='Exclui Nota', status_code=status.HTTP_204_NO_CONTENT)
+@todo_router.delete('/{todo_id}', summary='Excluir Nota', status_code=status.HTTP_204_NO_CONTENT)
 def delete(todo_id: UUID, current_user: User = Depends(get_current_user),
            session: Session = Depends(get_session)):
     if not TodoService.delete_todo(session, current_user, todo_id):
